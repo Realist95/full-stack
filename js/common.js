@@ -157,6 +157,66 @@ let common = {
             html('table', result.html);
         });
     },
+
+    user_edit_window: (user_id, e) => {
+        // actions
+        cancel_event(e);
+        common.menu_popup_hide_all('all');
+        // vars
+        let data = {user_id: user_id};
+        let location = {dpt: 'user', act: 'edit_window'};
+        // call
+        request({location: location, data: data}, (result) => {
+            common.modal_show(400, result.html);
+        });
+    },
+
+    user_edit_update: (user_id = 0) => {
+        // vars
+        let data = {
+            user_id: user_id,
+            first_name: gv('first_name'),
+            last_name: gv('last_name'),
+            phone: gv('phone'),
+            email: gv('email'),
+            plot_id: gv('plot_id'),
+            offset: global.offset
+        };
+
+        for (const key in data) {
+            remove_class(key, 'error');
+        }
+
+        let location = {dpt: 'user', act: 'edit_update'};
+        // call
+        request({location: location, data: data}, (result) => {
+            if(typeof result.error_code != 'undefined') {
+                for (const index in result.error_data) {
+                    add_class(result.error_data[index], 'error');
+                }
+            } else {
+                common.modal_hide();
+                html('table', result.html);
+            }
+        });
+    },
+
+    user_delete: (user_id = 0) => {
+        let needDelete = confirm('Are you sure you want to delete the user?');
+        if(!needDelete) return;
+
+        // vars
+        let data = {
+            user_id: user_id,
+            offset: global.offset
+        };
+        let location = {dpt: 'user', act: 'delete'};
+        // call
+        request({location: location, data: data}, (result) => {
+            common.modal_hide();
+            html('table', result.html);
+        });
+    },
 }
 
 add_event(document, 'DOMContentLoaded', common.init);
